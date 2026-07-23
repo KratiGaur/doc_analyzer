@@ -42,7 +42,7 @@ pip install -r requirements.txt
 4. Configure environment variables in `.env`:
 
 ```text
-GOOGLE_API_KEY=your_api_key_here
+GEMINI_API_KEY=your_api_key_here
 ```
 
 ## Run
@@ -51,8 +51,17 @@ GOOGLE_API_KEY=your_api_key_here
 streamlit run app.py
 ```
 
+## Deploy On Streamlit Community Cloud
+
+1. Push this repo to GitHub.
+2. In Streamlit Cloud, create a new app and set the repository root file to `app.py`.
+3. Add `GEMINI_API_KEY` in the app's secrets or environment variables.
+4. Keep `requirements.txt` in the repo so Streamlit can install Python dependencies.
+5. If you need OCR for scanned PDFs or images, add Streamlit Cloud system packages for `tesseract-ocr` and `poppler-utils`. Without those packages, OCR-based uploads may fail.
+
 ## Notes
 
 - The frontend is implemented in `frontend/app.py`, while supporting backend utilities are kept in `backend/utils/`.
 - `app.py` delegates to `frontend.app.main()` so the root file remains the launch entrypoint.
 - If you add new file types or models, update `backend/utils/file_parser.py` and `backend/utils/prompt_builder.py`.
+

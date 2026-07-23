@@ -1,9 +1,10 @@
 ﻿from backend.utils.phi_masker import mask_phi
 
 sample_text = """
-Patient Name: Krati
+Patient Name: John Doe
+Date of Birth: 01/01/2000
 Phone: 9876543210
-Email: krati123@gmail.com
+Email: IhC6V@example.com
 Aadhaar: 123456789012
 """
 
