@@ -57,11 +57,18 @@ streamlit run app.py
 2. In Streamlit Cloud, create a new app and set the repository root file to `app.py`.
 3. Add `GEMINI_API_KEY` in the app's secrets or environment variables.
 4. Keep `requirements.txt` in the repo so Streamlit can install Python dependencies.
-5. If you need OCR for scanned PDFs or images, add Streamlit Cloud system packages for `tesseract-ocr` and `poppler-utils`. Without those packages, OCR-based uploads may fail.
+5. This repo includes `packages.txt` with `tesseract-ocr` and `poppler-utils` so Streamlit Cloud can install OCR dependencies.
+
+6. If OCR-based uploads still fail, restart the app after saving secrets and packages in Streamlit Cloud.
 
 ## Notes
 
 - The frontend is implemented in `frontend/app.py`, while supporting backend utilities are kept in `backend/utils/`.
 - `app.py` delegates to `frontend.app.main()` so the root file remains the launch entrypoint.
 - If you add new file types or models, update `backend/utils/file_parser.py` and `backend/utils/prompt_builder.py`.
+
+
+
+
+
 
