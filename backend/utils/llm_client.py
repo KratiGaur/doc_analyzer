@@ -32,6 +32,16 @@ def _get_api_key() -> str:
         if secret_value:
             return str(secret_value).strip()
 
+    try:
+        general_section = st.secrets.get("general", {})
+        if isinstance(general_section, dict):
+            for key_name in ("GEMINI_API_KEY", "GOOGLE_API_KEY"):
+                secret_value = general_section.get(key_name, "")
+                if secret_value:
+                    return str(secret_value).strip()
+    except Exception:
+        pass
+
     return ""
 
 
