@@ -52,7 +52,8 @@ def _get_api_key() -> str:
     candidate_names = ("gemini_api_key", "google_api_key")
 
     for env_name, env_value in os.environ.items():
-        if _normalize_key(env_name) in candidate_names and env_value:
+        normalized_name = _normalize_key(env_name)
+        if normalized_name in candidate_names and env_value:
             return str(env_value).strip()
 
     try:
@@ -69,7 +70,7 @@ def _get_api_key() -> str:
 
     try:
         general_section = st.secrets.get("general", {})
-        if isinstance(general_section, dict):
+        if hasattr(general_section, "get"):
             general_value = _find_matching_value(general_section, candidate_names)
             if general_value:
                 return general_value
