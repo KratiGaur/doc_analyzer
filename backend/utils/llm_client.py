@@ -13,32 +13,53 @@ MODEL_NAME = "gemini-3.6-flash"
 _CODE_FENCE_RE = re.compile(r"^```(?:json|markdown|text)?\s*|\s*```$", re.IGNORECASE | re.DOTALL)
 
 
+def _normalize_key(key: str) -> str:
+    return str(key).strip().lower().replace("-", "_")
+
+
+def _find_matching_value(mapping, candidate_names: tuple[str, ...]) -> str:
+    if not mapping:
+        return ""
+
+    if isinstance(mapping, dict):
+        for key_name in candidate_names:
+            value = mapping.get(key_name, "")
+            if value:
+                return str(value).strip()
+
+        for key, value in mapping.items():
+            normalized_key = _normalize_key(key)
+            if normalized_key in candidate_names and value:
+                return str(value).strip()
+
+    return ""
+
+
 def _get_api_key() -> str:
-    env_key = (os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY") or "").strip()
-    if env_key:
-        return env_key
+    candidate_names = ("gemini_api_key", "google_api_key")
+
+    for env_name, env_value in os.environ.items():
+        if _normalize_key(env_name) in candidate_names and env_value:
+            return str(env_value).strip()
 
     try:
         import streamlit as st
     except Exception:
         return ""
 
-    for key_name in ("GEMINI_API_KEY", "GOOGLE_API_KEY"):
-        try:
-            secret_value = st.secrets.get(key_name, "")
-        except Exception:
-            secret_value = ""
-
-        if secret_value:
-            return str(secret_value).strip()
+    try:
+        top_level_value = _find_matching_value(st.secrets, candidate_names)
+        if top_level_value:
+            return top_level_value
+    except Exception:
+        pass
 
     try:
         general_section = st.secrets.get("general", {})
         if isinstance(general_section, dict):
-            for key_name in ("GEMINI_API_KEY", "GOOGLE_API_KEY"):
-                secret_value = general_section.get(key_name, "")
-                if secret_value:
-                    return str(secret_value).strip()
+            general_value = _find_matching_value(general_section, candidate_names)
+            if general_value:
+                return general_value
     except Exception:
         pass
 
@@ -48,6 +69,7 @@ def _get_api_key() -> str:
 def _configure_genai() -> str:
     api_key = _get_api_key()
     if api_key:
+        os.environ["GEMINI_API_KEY"] = api_key
         os.environ["GOOGLE_API_KEY"] = api_key
         try:
             genai.configure(api_key=api_key)
