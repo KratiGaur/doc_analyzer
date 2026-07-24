@@ -21,16 +21,29 @@ def _find_matching_value(mapping, candidate_names: tuple[str, ...]) -> str:
     if not mapping:
         return ""
 
-    if isinstance(mapping, dict):
-        for key_name in candidate_names:
-            value = mapping.get(key_name, "")
-            if value:
-                return str(value).strip()
+    try:
+        if hasattr(mapping, "get"):
+            for key_name in candidate_names:
+                value = mapping.get(key_name, "")
+                if value:
+                    return str(value).strip()
 
+            for key in mapping.keys():
+                normalized_key = _normalize_key(key)
+                if normalized_key in candidate_names:
+                    value = mapping.get(key, "")
+                    if value:
+                        return str(value).strip()
+    except Exception:
+        pass
+
+    try:
         for key, value in mapping.items():
             normalized_key = _normalize_key(key)
             if normalized_key in candidate_names and value:
                 return str(value).strip()
+    except Exception:
+        pass
 
     return ""
 
